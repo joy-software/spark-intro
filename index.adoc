@@ -1,0 +1,22 @@
+= Spark
+Stéphane Lopes <stephane.lopes@uvsq.fr>
+v2017-2018
+:doctype: book
+:toc: left
+:toc-title: Sommaire
+:sectanchors:
+:sectlinks:
+:sectnums:
+:stem:
+:icons: font
+:imagesdir: figs
+:sourcedir: ./exemples
+:source-highlighter: highlightjs
+:masterdoc:
+
+:leveloffset: +1
+
+include::intro.adoc[]
+
+:leveloffset: -1
+

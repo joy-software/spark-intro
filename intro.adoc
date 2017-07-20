@@ -1,0 +1,23 @@
+= Introduction
+ifndef::imagesdir[]
+Stéphane Lopes <stephane.lopes@uvsq.fr>
+v2017-2018
+:stem:
+:icons: font
+:imagesdir: figs
+:sourcedir: ../exemple
+:source-highlighter: highlightjs
+:revealjs_theme: blackmy
+:revealjs_slideNumber: true
+endif::imagesdir[]
+
+:leveloffset: +1
+
+include::intro/spark.adoc[]
+
+ifdef::masterdoc[]
+//include::intro/intro-td.adoc[]
+endif::masterdoc[]
+
+:leveloffset: -1
+
