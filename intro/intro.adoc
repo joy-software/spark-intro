@@ -13,10 +13,10 @@ endif::imagesdir[]
 
 :leveloffset: +1
 
-include::intro/spark.adoc[]
+include::spark.adoc[]
 
 ifdef::masterdoc[]
-//include::intro/intro-td.adoc[]
+//include::intro-td.adoc[]
 endif::masterdoc[]
 
 :leveloffset: -1

@@ -16,7 +16,7 @@ v2017-2018
 
 :leveloffset: +1
 
-include::intro.adoc[]
+include::intro/intro.adoc[]
 
 :leveloffset: -1
 
