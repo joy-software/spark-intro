@@ -1,2 +1,11 @@
+# generated html files
 html/
-
+# vim swap files
+*.swp
+# datasets
+notebooks/dpts.txt
+notebooks/prenoms.txt
+notebooks/prenoms_sample.txt/
+# jupyter temporary files
+.local
+notebooks/.ipynb_checkpoints/
