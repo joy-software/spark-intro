@@ -51,7 +51,7 @@ end
 
 desc "Génère les slides"
 task :generate_slides => %w[html/slides.html]
-file "html/slides.html" => [:init_figs, :init_html, "slides.adoc"] + chapter_files do
-    sh "asciidoctor-revealjs -r asciidoctor-diagram -D html/ slides.adoc"
+file "html/slides.html" => [:init_figs, :init_html, "index.adoc"] + chapter_files do
+    sh "asciidoctor-revealjs -r asciidoctor-diagram -D html/ -o slides.html index.adoc"
 end
 

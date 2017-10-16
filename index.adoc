@@ -1,18 +1,26 @@
 = Introduction à Spark
 Stéphane Lopes <stephane.lopes@uvsq.fr>
 v2017-2018
+ifndef::backend-revealjs[]
 :doctype: book
 :toc: left
 :toc-title: Sommaire
 :sectanchors:
 :sectlinks:
 :sectnums:
+endif::[]
 :stem:
 :icons: font
 :imagesdir: figs
 :sourcedir: ./exemples
 :source-highlighter: highlightjs
+ifndef::backend-revealjs[]
 :masterdoc:
+endif::[]
+ifdef::backend-revealjs[]
+:revealjs_theme: blackmy
+:revealjs_slideNumber: true
+endif::[]
 
 :leveloffset: +1
 
