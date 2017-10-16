@@ -1,18 +1,13 @@
 = Introduction à Spark
 Stéphane Lopes <stephane.lopes@uvsq.fr>
 v2017-2018
-:doctype: book
-:toc: left
-:toc-title: Sommaire
-:sectanchors:
-:sectlinks:
-:sectnums:
 :stem:
 :icons: font
 :imagesdir: figs
 :sourcedir: ./exemples
 :source-highlighter: highlightjs
-:masterdoc:
+:revealjs_theme: blackmy
+:revealjs_slideNumber: true
 
 :leveloffset: +1
 

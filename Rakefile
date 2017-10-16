@@ -9,7 +9,6 @@ REVEALJS_VERION = "3.5.0"
 # Array : https://ruby-doc.org/core-trunk/Array.html
 # Rake::FileList : http://ruby-doc.org/stdlib-trunk/libdoc/rake/rdoc/Rake/FileList.html
 chapter_files = Rake::FileList[chapters.map{|c| "#{c}/#{c}.adoc"}]
-slide_outfiles = Rake::FileList[chapters.map{|c| "html/#{c}.html"}]
 fig_dirs = Rake::FileList[chapters.map{|c| "#{c}/figs"}]
 
 desc "Génère la version livre et la version slides"
@@ -46,20 +45,13 @@ directory "html/figs"
 desc "Génère la version livre du cours"
 task :generate_book => %w[html/index.html]
 # file task
-file "html/index.html" => [:init_figs, :init_html] + chapter_files do
+file "html/index.html" => [:init_figs, :init_html, "index.adoc"] + chapter_files do
     sh "asciidoctor -r asciidoctor-diagram -D html/ index.adoc"
 end
 
 desc "Génère les slides"
-task :generate_slides => [:init_figs, :init_html] + slide_outfiles
-
-rule '.html' => ->(f){source_for_html(f)} do |t|
-    chapter = t.name.ext('').sub(/^html\//, '')
-    sh "asciidoctor-revealjs -r asciidoctor-diagram -D html/ #{chapter}/#{chapter}.adoc"
-end
-
-def source_for_html(html_file)
-    chapter = html_file.ext('').sub(/^html\//, '')
-    Rake::FileList["#{chapter}/*.adoc"]
+task :generate_slides => %w[html/slides.html]
+file "html/slides.html" => [:init_figs, :init_html, "slides.adoc"] + chapter_files do
+    sh "asciidoctor-revealjs -r asciidoctor-diagram -D html/ slides.adoc"
 end
 
