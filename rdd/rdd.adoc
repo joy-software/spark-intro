@@ -1,0 +1,87 @@
+= Développer avec les RDD
+== Initialiser Spark
+* L'interaction avec Spark débute par la création d'une instance de https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext[`SparkContext`]
+* Le contexte est créé à partir d'un objet https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkConf[`SparkConf`] qui configure l'application
+
+[source,scala]
+----
+val conf = new SparkConf().setAppName("Mon application")
+val sc = new SparkContext(conf)
+----
+
+* Dans un environnement interactif (`spark-shell` ou notebook), le contexte est en général créé automatiquement
+
+== Qu'est-ce qu'un RDD ?
+* Un _Resilient Distributed Datasets_ (RDD) est une collection partitionnée et immuable d'enregistrements
+* Un RDD est
+** en lecture seul
+** tolérant aux pannes (_resilient_)
+** distribué (partitions réparties sur les noeuds du cluster)
+* La tolérance aux pannes est assurée en maintenant la _lignée_ (_lineage_) de chaque RDD
+* Un RDD n'est pas nécessairement matérialisé (_évaluation paresseuse_)
+* Il est possible de contrôler la _stratégie de stockage_ d'un RDD ainsi que le _critère de partitionnement_ (et le nombre de partitions)
+
+== Création d'un RDD
+* Un RDD peut être créé à partir de données externes ou d'un autre RDD
+** à partir d'une collection avec `parallelize`
+
+[source,scala]
+----
+val data = Array(1, 2, 3, 4, 5)
+val distData = sc.parallelize(data)
+----
+
+** à partir d'un fichier texte avec `textFile`
+
+[source,scala]
+----
+val distFile = sc.textFile("data.txt")
+----
+
+** à partir d'un fichier binaire (`sequenceFile`, `hadoopRDD`)
+
+* Spark peut ouvrir directement un répertoire, un fichier compressé ou un ensemble de fichiers
+
+== Opérations sur un RDD
+* Un https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD[RDD] supporte deux types d'opérations : les _transformations_ et les _actions_
+* Une _transformation_ retourne un nouvel RDD par transformation du RDD courant
+* Une _action_ déclenche le calcul d'une valeur sur un RDD
+* Certaines opérations ne sont disponibles que pour des RDD particuliers
+https://spark.apache.org/docs/latest/api/scala/org/apache/spark/rdd/PairRDDFunctions.html[PairRDDFunctions]:: pour les RDD de paires (clé, valeur) (http://www.scala-lang.org/api/2.11.8/index.html#scala.Tuple2[`Tuple2`])
+https://spark.apache.org/docs/latest/api/scala/org/apache/spark/rdd/DoubleRDDFunctions.html[DoubleRDDFunctions]:: pour les RDD de `Double`
+https://spark.apache.org/docs/latest/api/scala/org/apache/spark/rdd/SequenceFileRDDFunctions.html[SequenceFileRDDFunctions]:: pour sauver les données au format _SequenceFile_
+* Un RDD peut être rendu persistant (`persist` ou `cache`) pour être réutiliser ultérieurement
+
+== Quelques transformations
+`filter`:: conserve les éléments validant le prédicat
+`map`:: applique une fonction sur chaque élément
+`flatMap`:: idem `map` mais désimbrique les collections
+`distinct`:: supprime les doublons
+`sample`:: extrait un échantillon aléatoire
+`groupByKey`:: regroupe selon les valeurs de clé
+`join`:: réalise la jointure entre deux RDDs
+
+== Quelques actions
+`reduce`:: applique une fonction de réduction
+`collect`:: retourne un tableau formé des éléments
+`count`:: retourne le nombre d'éléments
+`take`:: retourne un tableau des <n> premiers éléments
+`takeSample`:: retourne un tableau de <n> éléments
+`saveAsTextFile`:: sauve les éléments au format texte
+`countByKey`:: compte le nombre d'occurences de chaque clé
+
+== Shuffle
+* Certaines opérations déclenchent un _shuffle_ (mélange)
+* Un _shuffle_ redistribue les données dans les partitions
+* Cette opération est couteuse en terme d'I/O
+
+== Persistance des RDD
+* Un RDD peut être rendu persistant pour être réutilisé (`persist` ou `cache`)
+* Par défaut, un RDD est persistant en mémoire
+* La stratégie de persistance est définie en passant un objet https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.storage.StorageLevel[`StorageLevel`] à `persist` (`cache` rend uniquement persistant en mémoire)
+** `MEMORY_ONLY`, `MEMORY_AND_DISK`, `DISK_ONLY`, ...
+
+== Références
+* https://amplab.cs.berkeley.edu/publication/resilient-distributed-datasets-a-fault-tolerant-abstraction-for-in-memory-cluster-computing/[Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing], Matei et al., NSDI'2012.
+* https://spark.apache.org/docs/latest/rdd-programming-guide.html[Spark Programming Guide]
+

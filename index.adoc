@@ -25,6 +25,7 @@ endif::[]
 :leveloffset: +1
 
 include::intro/intro.adoc[]
+include::rdd/rdd.adoc[]
 
 :leveloffset: -1
 

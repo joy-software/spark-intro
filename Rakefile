@@ -2,7 +2,7 @@ require 'rake/clean'
 # rake/clean définit CLEAN (Rake::FileList) pour les fichiers temporaires
 # et CLOBBER (Rake::FileList) pour les fichiers de sortie
 
-chapters = %w[intro] # %w définit un tableau de chaînes
+chapters = %w[intro rdd] # %w définit un tableau de chaînes
 
 REVEALJS_VERION = "3.5.0"
 
