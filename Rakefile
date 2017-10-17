@@ -17,7 +17,8 @@ task :default => [:generate_book, :generate_slides]
 # task <cible> => <dépendances>
 
 desc "Initialise le répertoire de destination des fichiers html"
-task :init_html => "html" do |t|
+task :init_html => %w[html/reveal.js html/figs]
+directory "html/reveal.js" => "html" do |t|
     tn = t.source
     sh <<~HEREDOC
         wget -qO- https://github.com/hakimel/reveal.js/archive/#{REVEALJS_VERION}.tar.gz | \
@@ -28,30 +29,31 @@ task :init_html => "html" do |t|
         #{tn}/reveal.js/css/theme/black.css > #{tn}/reveal.js/css/theme/blackmy.css
     HEREDOC
 end
-# directory task pour créer le répertoire
-directory "html"
-# ajoute le répertoire html comme fichier de sortie
-CLOBBER << "html"
 
 desc "Initialise le répertoire des images"
-task :init_figs => [:init_html, "html/figs"] do
+directory "html/figs" => "html" do
+    mkdir_p "html/figs"
     cp Dir["figs/*.png", "figs/*.svg"], "html/figs"
     fig_dirs.each do |d|
         cp Dir["#{d}/*.png", "#{d}/*.svg"], "html/figs"
     end
 end
-directory "html/figs"
+
+# directory task pour créer le répertoire
+directory "html"
+# ajoute le répertoire html comme fichier de sortie
+CLOBBER << "html"
 
 desc "Génère la version livre du cours"
 task :generate_book => %w[html/index.html]
 # file task
-file "html/index.html" => [:init_figs, :init_html, "index.adoc"] + chapter_files do
+file "html/index.html" => [:init_html, "index.adoc"] + chapter_files do
     sh "asciidoctor -r asciidoctor-diagram -D html/ index.adoc"
 end
 
 desc "Génère les slides"
 task :generate_slides => %w[html/slides.html]
-file "html/slides.html" => [:init_figs, :init_html, "index.adoc"] + chapter_files do
+file "html/slides.html" => [:init_html, "index.adoc"] + chapter_files do
     sh "asciidoctor-revealjs -r asciidoctor-diagram -D html/ -o slides.html index.adoc"
 end
 
