@@ -8,3 +8,11 @@ En particulier, l'image [all-spark-notebook](https://hub.docker.com/r/jupyter/al
 docker run -it --rm -p 8888:8888 -v `pwd`:/home/jovyan jupyter/all-spark-notebook
 ```
 
+## Construction du support de cours
+Les slides sont au format http://asciidoctor.org/[asciidoctor].
+
+```bash
+bundle install
+rake
+```
+
