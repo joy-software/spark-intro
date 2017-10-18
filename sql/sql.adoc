@@ -1,0 +1,100 @@
+= Spark SQL
+== Introduction
+* Spark SQL est un module permettant de traiter des données structurées, i.e. avec un schéma
+* Ce module apporte un ensemble d'optimisations
+* L'interaction peut se faire en SQL ou avec une API spécifique (_dataset_/_dataframe_)
+
+== Dataset et dataframe
+* Un _dataset_ est une collection distribuée de données
+* L'API dataset apporte un typage fort et un moteur d'exécution optimisé
+* Un _dataframe_ est un dataset organisé à partir de colonne nommée, i.e. comme une table relationnelle ou un data frame en Python/R
+
+== Initialiser une session Spark SQL
+* Il faut d'abord créer une session Spark (https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SparkSession[SparkSession])
+
+[source,scala]
+----
+import org.apache.spark.sql.SparkSession
+
+val spark = SparkSession
+  .builder()
+  .getOrCreate()
+
+// Pour les conversions implicites entre RDD et datasets/dataframes
+import spark.implicits._
+----
+
+* Dans un environnement interactif (`spark-shell` ou notebook), la session est en général créée automatiquement
+
+== Création d'un dataframe
+* Un dataframe peut être créé à partir de données externes, d'une table Hive ou d'un RDD (en précisant le schéma)
+
+[source,scala]
+----
+val df = spark.read.json("people.json")
+df.show()
+----
+
+* En Scala ou Java, la manipulation d'un dataframe se fait grâce aux opérations non typées des https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.Dataset[datasets]
+
+== Création d'un dataset
+* Un dataset peut être créé à partir d'un dataframe ou d'un RDD
+
+[source,scala]
+----
+case class Person(name: String, age: Long)
+val caseClassDS = Seq(Person("Andy", 32)).toDS()
+val peopleDS = spark.read.json("people.json").as[Person]
+peopleDS.show()
+----
+
+* Un dataset utilise un encodeur spécifique pour sérialiser les objets de façon efficace
+** certaines opérations peuvent être réalisées sans désérialiser
+
+== Utiliser SQL
+* SQL est accessible avec la méthode `SparkSession.sql`
+* Il faut au préalable avoir enregistrée le dataset comme table
+
+[source,scala]
+----
+peopleDS.createOrReplaceTempView("people")
+spark.sql("SELECT * FROM people").show()
+----
+
+== Formats de fichiers supportés
+* un https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.Dataset[dataset] peut
+** charger les données à partir d'un fichier avec `SparkSession.read`
+** écrite les données dans un fichier avec `Dataset.write`
+* Plusieurs formats de fichiers (_csv_, _json_, _parquet_, ...) sont supportés ainsi que différents codecs de compression (_gzip_, _snappy_, ...)
+
+== Optimisation de requêtes
+* Chaque programme utilisant une API de Sparks SQL est traité par l'optimiseur de requête https://databricks.com/blog/2015/04/13/deep-dive-into-spark-sqls-catalyst-optimizer.html[Catalyst]
+
+image::catalyst.png[]
+Source : https://databricks.com/blog/2015/04/13/deep-dive-into-spark-sqls-catalyst-optimizer.html[Deep Dive into Spark SQL’s Catalyst Optimizer]
+
+* Le plan d'exécution d'un programme peut être visualisé avec `Dataset.explain`
+* Le projet https://databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html[Tungsten] améliore encore les performances en limitant l'impact de la gestion de la mémoire de la JVM, en utilisant les caches et en utilisant la génération de code
+
+== Références
+* https://amplab.cs.berkeley.edu/publication/shark-sql-and-rich-analytics-at-scale/[Shark: SQL and Rich Analytics at Scale], Xin et al., SIGMOD 2013
+* https://amplab.cs.berkeley.edu/publication/spark-sql-relational-data-processing-in-spark/[Spark SQL: Relational Data Processing in Spark], Armbrust et al., SIGMOD 2015
+* https://spark.apache.org/docs/latest/sql-programming-guide.html[Spark SQL, DataFrames and Datasets Guide]
+
+=== Catalyst
+* Cost-Based Optimizer in Apache Spark 2.2 (https://spark-summit.org/2017/events/cost-based-optimizer-in-apache-spark-22/[partie 1], https://spark-summit.org/2017/events/cost-based-optimizer-in-apache-spark-22-continues/[partie 2]), Spark Summit, juin 2017
+* https://spark-summit.org/2017/events/a-deep-dive-into-spark-sqls-catalyst-optimizer/[A deep dive into Spark SQLs Catalyst optimizer], Spark Summit, juin 2017
+* https://spark-summit.org/east-2017/events/sparksql-a-compiler-from-queries-to-rdds/[SparkSQL: A Compiler from Queries to RDDs], Spark Summit, fév. 2017
+* https://spark-summit.org/east-2017/events/optimizing-apache-spark-sql-joins/[Optimizing Apache Spark SQL Joins], Spark Summit, fév. 2017
+* https://databricks.com/blog/2017/02/16/processing-trillion-rows-per-second-single-machine-can-nested-loop-joins-fast.html[Processing a Trillion Rows Per Second on a Single Machine: How Can Nested Loop Joins be this Fast?] - Debugging a failing test case caused by query running “too fast”, fév. 2017
+* Spark SQL versus Apache Drill: Different Tools with Different Rules (https://www.slideshare.net/HadoopSummit/spark-sql-versus-apache-drill-different-tools-with-different-rules[slides], https://www.youtube.com/watch?v=Ud_adu9xNLI[video]), HadoopSummit, juil. 2016
+* http://fr.slideshare.net/databricks/deep-dive-into-catalyst-apache-spark-20s-optimizer[Deep Dive Into Catalyst: Apache Spark 2.0’s Optimizer], juin 2016
+* https://fr.slideshare.net/hkarau/beyond-shuffling-strata-london-2016[Beyond shuffling], Strata London 2016
+* https://blog.deepsense.ai/optimize-spark-with-distribute-by-and-cluster-by/[Optimize Spark with DISTRIBUTE BY & CLUSTER BY], juin 2016
+* https://databricks.com/blog/2015/04/13/deep-dive-into-spark-sqls-catalyst-optimizer.html[Deep Dive into Spark SQL’s Catalyst Optimizer], avr. 2015
+
+=== Projet Tungsten
+* https://databricks.com/blog/2016/05/23/apache-spark-as-a-compiler-joining-a-billion-rows-per-second-on-a-laptop.html[Apache Spark as a Compiler: Joining a Billion Rows per Second on a Laptop], mai 2016
+* https://spark-summit.org/2015/events/keynote-9/[From DataFrames to Tungsten A Peek into Spark’s Future], juin 2015
+* https://databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html[Project Tungsten: Bringing Apache Spark Closer to Bare Metal], avr. 2015
+
